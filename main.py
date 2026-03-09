@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 import redis
 import time
 
@@ -20,6 +20,13 @@ def get_hit_count():
 def read_root():
     count = get_hit_count()
     return {"Hello": f"w {count}"}
+
+@app.websocket('/ws')
+async def chat(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {data}")
 
 
 @app.get("/items/{item_id}")
