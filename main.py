@@ -1,6 +1,6 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 import redis
-import etcd3
+# import etcd3
 import time
 import os
 from lib.test import TestClass
@@ -12,18 +12,18 @@ def get_redis():
     return redis.Redis(host='redis', port=6379)
 
 
-def get_etcd():
-    return etcd3.client(
-        host=os.environ.get('ETCD_HOST', 'localhost'),
-        port=int(os.environ.get('ETCD_PORT', 2379)),
-    )
+# def get_etcd():
+#     return etcd3.client(
+#         host=os.environ.get('ETCD_HOST', 'localhost'),
+#         port=int(os.environ.get('ETCD_PORT', 2379)),
+#     )
 
 
-@app.on_event("startup")
-def register_service():
-    client = get_etcd()
-    lease = client.lease(ttl=10000000)
-    client.put('/services/myserver', 'localhost:8000', lease)
+# @app.on_event("startup")
+# def register_service():
+#     client = get_etcd()
+#     lease = client.lease(ttl=10000000)
+#     client.put('/services/myserver', 'localhost:8000', lease)
 
 
 def get_hit_count(cache):
@@ -39,10 +39,8 @@ def get_hit_count(cache):
 
 
 @app.get("/")
-def read_root(cache=Depends(get_redis), client=Depends(get_etcd)):
+def read_root(cache=Depends(get_redis), ):
     count = get_hit_count(cache)
-    value, metadata = client.get('/services/myserver')
-    print(value)
     testClass = TestClass()
     testClass.test_function()
     return {"Hello": f"w {count}"}
