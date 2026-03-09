@@ -3,6 +3,7 @@ import redis
 import etcd3
 import time
 import os
+from lib.test import test_function
 
 app = FastAPI()
 cache = redis.Redis(host='redis', port=6379)
@@ -26,6 +27,7 @@ def read_root():
     count = get_hit_count()
     value, metadata = client.get('/services/myserver')
     print(value)  # 'localhost:8080'
+    test_function()
     return {"Hello": f"w {count}"}
 
 @app.websocket('/ws')
