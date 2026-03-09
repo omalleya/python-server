@@ -1,9 +1,14 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import redis
+import etcd3
 import time
+import os
 
 app = FastAPI()
 cache = redis.Redis(host='redis', port=6379)
+client = etcd3.client(host=os.environ.get('ETCD_HOST', 'localhost'), port=int(os.environ.get('ETCD_PORT', 2379)))
+lease = client.lease(ttl=10000000)
+client.put('/services/myserver', 'localhost:8000', lease)
 
 def get_hit_count():
     retries = 5
@@ -19,14 +24,19 @@ def get_hit_count():
 @app.get("/")
 def read_root():
     count = get_hit_count()
+    value, metadata = client.get('/services/myserver')
+    print(value)  # 'localhost:8080'
     return {"Hello": f"w {count}"}
 
 @app.websocket('/ws')
 async def chat(websocket: WebSocket):
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Message text was: {data}")
+    except WebSocketDisconnect:
+        print("Client disconnected")
 
 
 @app.get("/items/{item_id}")
