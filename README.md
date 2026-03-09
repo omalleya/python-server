@@ -9,7 +9,7 @@ Unit tests (no Docker required):
 PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python -m pytest tests/test_unit.py -v
 ```
 
-Integration tests (requires `docker compose up`):
+Integration tests (requires server running `docker compose up --build`):
 ```
 python -m pytest tests/test_integration.py -v
 ```

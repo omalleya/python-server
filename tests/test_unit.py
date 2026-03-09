@@ -9,10 +9,10 @@ def make_mock_redis(hit_count=1):
     return mock
 
 
-def make_mock_etcd():
-    mock = MagicMock()
-    mock.get.return_value = (b'localhost:8000', None)
-    return mock
+# def make_mock_etcd():
+#     mock = MagicMock()
+#     mock.get.return_value = (b'localhost:8000', None)
+#     return mock
 
 
 def test_read_root():
